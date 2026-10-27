@@ -30,63 +30,63 @@ export async function fetchJson(url, params, options) {
         for (const pKey in params) currentUrl.searchParams.set(pKey, params[pKey]);
     }
 
+    const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
+
+    // Route through CORS proxy by default for static hosting (GitHub Pages) to bypass browser CORS restrictions
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlStr)}`;
+
     try {
-        const response = await fetch(currentUrl, options);
+        const response = await fetch(proxyUrl, options);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
-    } catch (error) {
-        console.warn("API request failed for URL:", currentUrl, error);
-
-        // Try CORS proxy fallback if direct fetch failed (e.g. CORS block from GitHub Pages)
+    } catch (proxyError) {
+        console.warn("CORS proxy request failed, attempting direct fetch...", proxyError);
         try {
-            const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
-            if (!urlStr.includes("corsproxy.io")) {
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlStr)}`;
-                console.log("Attempting CORS proxy fallback:", proxyUrl);
-                const proxyRes = await fetch(proxyUrl, options);
-                if (proxyRes.ok) {
-                    return await proxyRes.json();
+            const response = await fetch(currentUrl, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`, { cause: proxyError });
+            }
+            return await response.json();
+        } catch (directError) {
+            console.warn("Direct fetch failed as well, trying instance failover...", directError);
+
+            const currentApi = apiUrl();
+            if (urlStr.includes(currentApi)) {
+                const fallbacks = await getFallbackInstances();
+                const otherFallbacks = fallbacks.filter(i => i !== currentApi);
+
+                for (const backupUrl of otherFallbacks) {
+                    try {
+                        console.log("Attempting fallback to instance:", backupUrl);
+                        setPreference("instance", backupUrl, true);
+
+                        let backupReqUrl = urlStr.replace(currentApi, backupUrl);
+                        if (params) {
+                            backupReqUrl = new URL(backupReqUrl);
+                            for (const bKey in params) backupReqUrl.searchParams.set(bKey, params[bKey]);
+                        }
+
+                        const backupUrlStr = backupReqUrl instanceof URL ? backupReqUrl.href : String(backupReqUrl);
+                        const backupProxyUrl = `https://corsproxy.io/?${encodeURIComponent(backupUrlStr)}`;
+
+                        const response = await fetch(backupProxyUrl, options);
+                        if (response.ok) {
+                            window.dispatchEvent(
+                                new CustomEvent("piped-instance-fallback", {
+                                    detail: { oldInstance: currentApi, newInstance: backupUrl },
+                                }),
+                            );
+                            return await response.json();
+                        }
+                    } catch (backupErr) {
+                        console.warn("Fallback instance failed:", backupUrl, backupErr);
+                    }
                 }
             }
-        } catch (proxyErr) {
-            console.warn("CORS proxy fallback failed:", proxyErr);
+            throw new Error(`All fetch attempts failed for ${urlStr}`, { cause: directError });
         }
-
-        const currentApi = apiUrl();
-        const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
-
-        if (urlStr.includes(currentApi)) {
-            const fallbacks = await getFallbackInstances();
-            const otherFallbacks = fallbacks.filter(i => i !== currentApi);
-
-            for (const backupUrl of otherFallbacks) {
-                try {
-                    console.log("Attempting fallback to instance:", backupUrl);
-                    setPreference("instance", backupUrl, true);
-
-                    let backupReqUrl = urlStr.replace(currentApi, backupUrl);
-                    if (params) {
-                        backupReqUrl = new URL(backupReqUrl);
-                        for (const bKey in params) backupReqUrl.searchParams.set(bKey, params[bKey]);
-                    }
-
-                    const response = await fetch(backupReqUrl, options);
-                    if (response.ok) {
-                        window.dispatchEvent(
-                            new CustomEvent("piped-instance-fallback", {
-                                detail: { oldInstance: currentApi, newInstance: backupUrl },
-                            }),
-                        );
-                        return await response.json();
-                    }
-                } catch (backupErr) {
-                    console.warn("Fallback instance failed:", backupUrl, backupErr);
-                }
-            }
-        }
-        throw error;
     }
 }
 
