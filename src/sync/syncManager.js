@@ -55,7 +55,15 @@ export async function collectLocalData() {
     const preferences = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && !key.startsWith("gistToken") && !key.startsWith("authToken")) {
+        if (
+            key &&
+            !key.startsWith("gistToken") &&
+            !key.startsWith("ghRepoToken") &&
+            !key.startsWith("authToken") &&
+            !key.toLowerCase().includes("token") &&
+            !key.toLowerCase().includes("password") &&
+            !key.toLowerCase().includes("secret")
+        ) {
             preferences[key] = localStorage.getItem(key);
         }
     }
