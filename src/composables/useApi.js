@@ -1,13 +1,71 @@
-import { getPreferenceBoolean, getPreferenceString } from "./usePreferences.js";
+import { getPreferenceBoolean, getPreferenceString, setPreference } from "./usePreferences.js";
 
-export function fetchJson(url, params, options) {
-    if (params) {
-        url = new URL(url);
-        for (var param in params) url.searchParams.set(param, params[param]);
+let fallbackInstancesCache = [];
+
+async function getFallbackInstances() {
+    if (fallbackInstancesCache.length > 0) return fallbackInstancesCache;
+    try {
+        const res = await fetch("https://piped-instances.kavin.rocks/");
+        if (res.ok) {
+            const data = await res.json();
+            fallbackInstancesCache = data.map(i => i.api_url).filter(Boolean);
+        }
+    } catch (e) {
+        console.error("Failed to fetch public instances for fallback", e);
     }
-    return fetch(url, options).then(response => {
-        return response.json();
-    });
+    return fallbackInstancesCache;
+}
+
+export async function fetchJson(url, params, options) {
+    let currentUrl = url;
+    if (params) {
+        currentUrl = new URL(url);
+        for (const pKey in params) currentUrl.searchParams.set(pKey, params[pKey]);
+    }
+
+    try {
+        const response = await fetch(currentUrl, options);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.warn("API request failed for URL:", currentUrl, error);
+
+        const currentApi = apiUrl();
+        const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
+
+        if (urlStr.includes(currentApi)) {
+            const fallbacks = await getFallbackInstances();
+            const otherFallbacks = fallbacks.filter(i => i !== currentApi);
+
+            for (const backupUrl of otherFallbacks) {
+                try {
+                    console.log("Attempting fallback to instance:", backupUrl);
+                    setPreference("instance", backupUrl, true);
+
+                    let backupReqUrl = urlStr.replace(currentApi, backupUrl);
+                    if (params) {
+                        backupReqUrl = new URL(backupReqUrl);
+                        for (const bKey in params) backupReqUrl.searchParams.set(bKey, params[bKey]);
+                    }
+
+                    const response = await fetch(backupReqUrl, options);
+                    if (response.ok) {
+                        window.dispatchEvent(
+                            new CustomEvent("piped-instance-fallback", {
+                                detail: { oldInstance: currentApi, newInstance: backupUrl },
+                            }),
+                        );
+                        return await response.json();
+                    }
+                } catch (backupErr) {
+                    console.warn("Fallback instance failed:", backupUrl, backupErr);
+                }
+            }
+        }
+        throw error;
+    }
 }
 
 export function hashCode(s) {

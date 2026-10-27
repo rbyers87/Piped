@@ -498,6 +498,29 @@ async function setPlayerAttrs(localPlayer, el, uri, mime, shaka) {
     playerInstance
         .load(uri, null, mime)
         .then(async () => {
+            if ("mediaSession" in navigator && props.video) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: props.video.title || "Piped Video",
+                    artist: props.video.uploader || props.video.channelName || "Piped",
+                    artwork: props.video.thumbnail
+                        ? [{ src: props.video.thumbnail, sizes: "512x512", type: "image/jpeg" }]
+                        : [],
+                });
+
+                navigator.mediaSession.setActionHandler("play", () => {
+                    el.play();
+                });
+                navigator.mediaSession.setActionHandler("pause", () => {
+                    el.pause();
+                });
+                navigator.mediaSession.setActionHandler("seekbackward", details => {
+                    el.currentTime = Math.max(el.currentTime - (details.seekOffset || 10), 0);
+                });
+                navigator.mediaSession.setActionHandler("seekforward", details => {
+                    el.currentTime = Math.min(el.currentTime + (details.seekOffset || 10), el.duration);
+                });
+            }
+
             // Player.load()'s startTime arg does not reliably perform the
             // initial seek; apply it here. See shaka-project/shaka-player#6241.
             if (startTime > 0) {

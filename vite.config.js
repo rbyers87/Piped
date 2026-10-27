@@ -56,8 +56,12 @@ export default defineConfig({
                 ],
             },
             manifest: {
-                name: "Piped",
+                name: "Piped PWA",
                 short_name: "Piped",
+                description: "Free, static, installable PWA that plays YouTube content via public Piped API instances",
+                start_url: "./",
+                scope: "./",
+                display: "standalone",
                 background_color: "#000000",
                 theme_color: "#fa4b4b",
                 icons: [

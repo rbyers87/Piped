@@ -13,6 +13,9 @@
         </div>
 
         <FooterComponent />
+        <ToastComponent v-if="toastMessage" @dismissed="toastMessage = null">
+            <span v-text="toastMessage" />
+        </ToastComponent>
     </div>
 </template>
 
@@ -20,6 +23,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import NavBar from "./components/NavBar.vue";
 import FooterComponent from "./components/FooterComponent.vue";
+import ToastComponent from "./components/ToastComponent.vue";
 import { testLocalStorage, usePreferenceString } from "@/composables/usePreferences.js";
 import { getDefaultLanguage, TimeAgo, TimeAgoConfig } from "@/composables/useFormatting.js";
 import { fetchSubscriptions } from "@/composables/useSubscriptions.js";
@@ -30,6 +34,14 @@ const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 const themePreference = usePreferenceString("theme", "dark");
 const localePreference = usePreferenceString("hl", "en");
 const theme = ref("dark");
+const toastMessage = ref(null);
+
+function handleInstanceFallback(e) {
+    toastMessage.value = `Instance offline. Switched to backup instance: ${e.detail.newInstance}`;
+    setTimeout(() => {
+        if (toastMessage.value) toastMessage.value = null;
+    }, 6000);
+}
 
 function setTheme() {
     const themes = {
@@ -152,10 +164,13 @@ onMounted(() => {
             applyLocale(locale);
         });
     })();
+
+    window.addEventListener("piped-instance-fallback", handleInstanceFallback);
 });
 
 onBeforeUnmount(() => {
     darkModePreference.removeEventListener("change", handlePreferredColorSchemeChange);
+    window.removeEventListener("piped-instance-fallback", handleInstanceFallback);
 });
 </script>
 

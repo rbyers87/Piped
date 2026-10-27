@@ -346,6 +346,68 @@
     </div>
     <br />
 
+    <h2 class="text-center">Free Sync (GitHub Gist)</h2>
+    <p class="text-center text-sm text-gray-500">
+        Sync subscriptions, playlists, and history privately to your own GitHub Gist.
+    </p>
+    <label
+        class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800"
+        for="txtGistToken"
+    >
+        <strong>GitHub Personal Access Token (gist scope)</strong>
+        <input
+            id="txtGistToken"
+            v-model="gistToken"
+            type="password"
+            placeholder="ghp_..."
+            class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
+        />
+    </label>
+    <label
+        class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800"
+        for="txtGistId"
+    >
+        <strong>GitHub Gist ID (leave blank to create new)</strong>
+        <input
+            id="txtGistId"
+            v-model="gistId"
+            type="text"
+            placeholder="Optional Gist ID"
+            class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
+        />
+    </label>
+    <div class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800">
+        <span class="text-sm text-green-500" v-text="syncStatus" />
+        <div>
+            <button
+                class="inline-block w-auto cursor-pointer rounded-sm bg-red-600 py-2 px-4 text-white hover:bg-red-700"
+                @click="performSync"
+            >
+                Sync Now
+            </button>
+            <button
+                class="ml-2 inline-block w-auto cursor-pointer rounded-sm bg-gray-300 py-2 px-4 text-gray-600 hover:bg-gray-500 hover:text-white dark:bg-dark-400 dark:text-gray-400"
+                @click="exportFullBackup"
+            >
+                Export Full Backup
+            </button>
+            <label
+                for="fullBackupSelector"
+                class="ml-2 inline-block w-auto cursor-pointer rounded-sm bg-gray-300 py-2 px-4 text-gray-600 hover:bg-gray-500 hover:text-white dark:bg-dark-400 dark:text-gray-400"
+            >
+                Import Backup
+            </label>
+            <input
+                id="fullBackupSelector"
+                ref="fullBackupSelectorEl"
+                class="hidden"
+                type="file"
+                @change="importFullBackup"
+            />
+        </div>
+    </div>
+    <br />
+
     <!-- options that are visible only when logged in -->
     <div v-if="authenticated">
         <h2 v-t="'titles.account'" class="text-center"></h2>
@@ -475,12 +537,60 @@ import { fetchJson, apiUrl, authApiUrl, getAuthToken, hashCode, isAuthenticated 
 import { getCustomInstances } from "@/composables/useCustomInstances";
 import { download } from "@/composables/useMisc";
 import { getDefaultLanguage } from "@/composables/useFormatting";
+import {
+    syncWithGist,
+    getSyncToken,
+    getGistId,
+    setSyncConfig,
+    collectLocalData,
+    importData,
+} from "@/sync/syncManager.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
 const fileSelectorEl = ref(null);
+const fullBackupSelectorEl = ref(null);
+const gistToken = ref(getSyncToken());
+const gistId = ref(getGistId());
+const syncStatus = ref("");
+
+async function performSync() {
+    try {
+        setSyncConfig(gistToken.value, gistId.value);
+        syncStatus.value = "Syncing with GitHub Gist...";
+        const res = await syncWithGist();
+        gistId.value = getGistId();
+        syncStatus.value = `Synced successfully at ${new Date(res.updatedAt).toLocaleTimeString()}`;
+    } catch (e) {
+        console.error(e);
+        syncStatus.value = `Sync failed: ${e.message}`;
+    }
+}
+
+async function exportFullBackup() {
+    try {
+        const data = await collectLocalData();
+        download(JSON.stringify(data, null, 2), "piped-full-backup.json", "application/json");
+    } catch (e) {
+        alert("Export failed: " + e.message);
+    }
+}
+
+async function importFullBackup() {
+    const file = fullBackupSelectorEl.value?.files[0];
+    if (!file) return;
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        await importData(data);
+        alert("Backup imported successfully! Reloading...");
+        window.location.reload();
+    } catch (e) {
+        alert("Import failed: " + e.message);
+    }
+}
 
 function createDefaultSkipOptions() {
     return {
