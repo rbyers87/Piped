@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "updatedAt": 1793117327813,
+  "updatedAt": 1793117602431,
   "subscriptions": {
     "items": [],
-    "updatedAt": 1793117327813
+    "updatedAt": 1793117602431
   },
   "watchHistory": {
     "items": [],
-    "updatedAt": 1793117327813
+    "updatedAt": 1793117602431
   },
   "playlists": {
     "items": [],
-    "updatedAt": 1793117327813
+    "updatedAt": 1793117602431
   },
   "preferences": {
     "items": {
@@ -20,8 +20,8 @@
       "ghRepoOwner": "rbyers87",
       "ghRepoName": "Piped",
       "ghRepoBranch": "master",
-      "instance": "https://pipedapi.ducks.party"
+      "instance": "https://pipedapi.kavin.rocks"
     },
-    "updatedAt": 1793117327813
+    "updatedAt": 1793117602431
   }
 }
