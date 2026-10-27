@@ -246,7 +246,15 @@ export async function syncWithGist() {
                 },
             }),
         });
-        if (!res.ok) throw new Error(`Failed to create Gist: ${res.status}`);
+        if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            if (res.status === 403) {
+                throw new Error(
+                    "GitHub Gist creation forbidden (403). Ensure your Personal Access Token has the 'gist' scope enabled.",
+                );
+            }
+            throw new Error(`Failed to create Gist: ${res.status} ${errJson.message || ""}`);
+        }
         const created = await res.json();
         setSyncConfig(token, created.id);
     }

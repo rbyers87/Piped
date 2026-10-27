@@ -101,6 +101,11 @@ export async function saveDbToRepo(mergedData, sha = null) {
 
     if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
+        if (res.status === 404) {
+            throw new Error(
+                `Repository '${owner}/${repo}' not found or token lacks 'repo' permissions. Please create the repository on GitHub first.`,
+            );
+        }
         throw new Error(`Failed to commit database to repository: ${res.status} ${errJson.message || ""}`);
     }
 
