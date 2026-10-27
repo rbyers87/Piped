@@ -131,6 +131,19 @@ export async function syncWithRepo() {
     }
 
     const mergedData = await mergeAndSave(remoteData);
-    const result = await saveDbToRepo(mergedData, remoteSha);
-    return result;
+
+    try {
+        const result = await saveDbToRepo(mergedData, remoteSha);
+        return result;
+    } catch (e) {
+        if (e.message && e.message.includes("409")) {
+            console.warn("SHA conflict (409) detected, refetching latest SHA and retrying...");
+            const latestRemote = await fetchDbFromRepo();
+            const latestSha = latestRemote ? latestRemote.sha : null;
+            const latestData = latestRemote ? latestRemote.content : null;
+            const reMerged = await mergeAndSave(latestData);
+            return await saveDbToRepo(reMerged, latestSha);
+        }
+        throw e;
+    }
 }
