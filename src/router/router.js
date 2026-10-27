@@ -100,7 +100,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes,
     scrollBehavior: function (_to, _from, savedPosition) {
         return savedPosition ? savedPosition : window.scrollTo(0, 0);
