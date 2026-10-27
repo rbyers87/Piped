@@ -9,7 +9,7 @@ let fallbackInstancesCache = [
 
 async function getFallbackInstances() {
     try {
-        const res = await fetch("https://piped-instances.kavin.rocks/");
+        const res = await fetch("https://corsproxy.io/?https%3A%2F%2Fpiped-instances.kavin.rocks%2F");
         if (res.ok) {
             const data = await res.json();
             const fetched = data.map(i => i.api_url).filter(Boolean);
@@ -38,6 +38,21 @@ export async function fetchJson(url, params, options) {
         return await response.json();
     } catch (error) {
         console.warn("API request failed for URL:", currentUrl, error);
+
+        // Try CORS proxy fallback if direct fetch failed (e.g. CORS block from GitHub Pages)
+        try {
+            const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
+            if (!urlStr.includes("corsproxy.io")) {
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlStr)}`;
+                console.log("Attempting CORS proxy fallback:", proxyUrl);
+                const proxyRes = await fetch(proxyUrl, options);
+                if (proxyRes.ok) {
+                    return await proxyRes.json();
+                }
+            }
+        } catch (proxyErr) {
+            console.warn("CORS proxy fallback failed:", proxyErr);
+        }
 
         const currentApi = apiUrl();
         const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
