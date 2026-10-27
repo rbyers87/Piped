@@ -1,17 +1,24 @@
 import { getPreferenceBoolean, getPreferenceString, setPreference } from "./usePreferences.js";
 
-let fallbackInstancesCache = [];
+let fallbackInstancesCache = [
+    "https://pipedapi.adminforge.de",
+    "https://pipedapi.privacy.com.de",
+    "https://pipedapi.kavin.rocks",
+    "https://pipedapi.ducks.party",
+];
 
 async function getFallbackInstances() {
-    if (fallbackInstancesCache.length > 0) return fallbackInstancesCache;
     try {
         const res = await fetch("https://piped-instances.kavin.rocks/");
         if (res.ok) {
             const data = await res.json();
-            fallbackInstancesCache = data.map(i => i.api_url).filter(Boolean);
+            const fetched = data.map(i => i.api_url).filter(Boolean);
+            if (fetched.length > 0) {
+                fallbackInstancesCache = Array.from(new Set([...fetched, ...fallbackInstancesCache]));
+            }
         }
     } catch (e) {
-        console.error("Failed to fetch public instances for fallback", e);
+        console.error("Failed to fetch public instances for fallback, using curated list", e);
     }
     return fallbackInstancesCache;
 }

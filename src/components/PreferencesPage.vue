@@ -408,6 +408,73 @@
     </div>
     <br />
 
+    <h2 class="text-center">Database in GitHub Repository</h2>
+    <p class="text-center text-sm text-gray-500">
+        Store and commit your app database (`piped-db.json`) directly inside your own GitHub repository.
+    </p>
+    <label
+        class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800"
+        for="txtRepoToken"
+    >
+        <strong>GitHub Personal Access Token (repo scope)</strong>
+        <input
+            id="txtRepoToken"
+            v-model="ghRepoToken"
+            type="password"
+            placeholder="ghp_..."
+            class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
+        />
+    </label>
+    <label
+        class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800"
+        for="txtRepoOwner"
+    >
+        <strong>Repository Owner (Username / Org)</strong>
+        <input
+            id="txtRepoOwner"
+            v-model="ghRepoOwner"
+            type="text"
+            placeholder="e.g. username"
+            class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
+        />
+    </label>
+    <label
+        class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800"
+        for="txtRepoName"
+    >
+        <strong>Repository Name</strong>
+        <input
+            id="txtRepoName"
+            v-model="ghRepoName"
+            type="text"
+            placeholder="e.g. piped-db"
+            class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
+        />
+    </label>
+    <label
+        class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800"
+        for="txtRepoBranch"
+    >
+        <strong>Branch</strong>
+        <input
+            id="txtRepoBranch"
+            v-model="ghRepoBranch"
+            type="text"
+            placeholder="main"
+            class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
+        />
+    </label>
+    <div class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800">
+        <span class="text-sm text-green-500" v-text="syncStatus" />
+        <button
+            class="inline-block w-auto cursor-pointer rounded-sm bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+            @click="performRepoSync"
+        >
+            Sync to Repository
+        </button>
+    </div>
+    <br />
+
     <!-- options that are visible only when logged in -->
     <div v-if="authenticated">
         <h2 v-t="'titles.account'" class="text-center"></h2>
@@ -545,6 +612,7 @@ import {
     collectLocalData,
     importData,
 } from "@/sync/syncManager.js";
+import { syncWithRepo, getRepoConfig, setRepoConfig } from "@/sync/githubRepoDb.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -556,6 +624,12 @@ const gistToken = ref(getSyncToken());
 const gistId = ref(getGistId());
 const syncStatus = ref("");
 
+const repoConfig = getRepoConfig();
+const ghRepoToken = ref(repoConfig.token);
+const ghRepoOwner = ref(repoConfig.owner);
+const ghRepoName = ref(repoConfig.repo);
+const ghRepoBranch = ref(repoConfig.branch || "main");
+
 async function performSync() {
     try {
         setSyncConfig(gistToken.value, gistId.value);
@@ -566,6 +640,18 @@ async function performSync() {
     } catch (e) {
         console.error(e);
         syncStatus.value = `Sync failed: ${e.message}`;
+    }
+}
+
+async function performRepoSync() {
+    try {
+        setRepoConfig(ghRepoToken.value, ghRepoOwner.value, ghRepoName.value, ghRepoBranch.value);
+        syncStatus.value = "Syncing with GitHub Repository...";
+        const res = await syncWithRepo();
+        syncStatus.value = `Repo DB synced successfully at ${new Date(res.updatedAt).toLocaleTimeString()}`;
+    } catch (e) {
+        console.error(e);
+        syncStatus.value = `Repo sync failed: ${e.message}`;
     }
 }
 
