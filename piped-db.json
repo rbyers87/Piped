@@ -1,29 +1,29 @@
 {
-    "version": 1,
-    "updatedAt": 1793117995610,
-    "subscriptions": {
-        "items": [],
-        "updatedAt": 1793117602431
+  "version": 1,
+  "updatedAt": 1793118800766,
+  "subscriptions": {
+    "items": [],
+    "updatedAt": 1793118800766
+  },
+  "watchHistory": {
+    "items": [],
+    "updatedAt": 1793118800766
+  },
+  "playlists": {
+    "items": [],
+    "updatedAt": 1793118800766
+  },
+  "preferences": {
+    "items": {
+      "nexustube_settings": "{\"theme\":\"dark\",\"accentColor\":\"#c084fc\",\"density\":\"comfortable\",\"sidebarCollapsed\":false,\"gridColumns\":3,\"youtubeApiKey\":\"AIzaSyBzWXMG8igOZPP7i_PXHiWMqO9xOznlIUs\",\"autoplay\":true,\"featuredContentEnabled\":true,\"sponsorBlockEnabled\":false}",
+      "skipOptions": "{\"sponsor\":\"auto\",\"intro\":\"no\",\"outro\":\"no\",\"preview\":\"no\",\"interaction\":\"auto\",\"selfpromo\":\"auto\",\"music_offtopic\":\"auto\",\"poi_highlight\":\"no\",\"filler\":\"no\"}",
+      "ghRepoOwner": "rbyers87",
+      "ghRepoName": "Piped",
+      "ghRepoBranch": "master",
+      "instance": "https://pipedapi.adminforge.de",
+      "subscriptions_updatedAt": "1793117602431",
+      "localSubscriptions": "[]"
     },
-    "watchHistory": {
-        "items": [],
-        "updatedAt": 1793117995610
-    },
-    "playlists": {
-        "items": [],
-        "updatedAt": 1793117995610
-    },
-    "preferences": {
-        "items": {
-            "nexustube_settings": "{\"theme\":\"dark\",\"accentColor\":\"#c084fc\",\"density\":\"comfortable\",\"sidebarCollapsed\":false,\"gridColumns\":3,\"youtubeApiKey\":\"AIzaSyBzWXMG8igOZPP7i_PXHiWMqO9xOznlIUs\",\"autoplay\":true,\"featuredContentEnabled\":true,\"sponsorBlockEnabled\":false}",
-            "skipOptions": "{\"sponsor\":\"auto\",\"intro\":\"no\",\"outro\":\"no\",\"preview\":\"no\",\"interaction\":\"auto\",\"selfpromo\":\"auto\",\"music_offtopic\":\"auto\",\"poi_highlight\":\"no\",\"filler\":\"no\"}",
-            "ghRepoOwner": "rbyers87",
-            "ghRepoName": "Piped",
-            "ghRepoBranch": "master",
-            "instance": "https://pipedapi.kavin.rocks",
-            "subscriptions_updatedAt": "1793117602431",
-            "localSubscriptions": "[]"
-        },
-        "updatedAt": 1793117995610
-    }
+    "updatedAt": 1793118800766
+  }
 }
