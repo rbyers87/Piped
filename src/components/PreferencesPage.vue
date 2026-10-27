@@ -897,18 +897,68 @@ function onChange() {
 async function fetchInstances() {
     customInstances.value = getCustomInstances();
 
-    fetchJson(import.meta.env.VITE_PIPED_INSTANCES).then(resp => {
-        publicInstances.value = resp;
-        if (!publicInstances.value.some(instance => instance.api_url == apiUrl())) {
-            publicInstances.value.push({
-                name: "Selected Instance",
-                api_url: apiUrl(),
-                locations: "Unknown",
-                cdn: false,
-                uptime_30d: 100,
-            });
+    const curatedFallbacks = [
+        {
+            name: "AdminForge",
+            api_url: "https://pipedapi.adminforge.de",
+            locations: "Germany",
+            cdn: true,
+            up_to_date: true,
+            uptime_30d: 99.9,
+            registered: "Yes",
+        },
+        {
+            name: "Privacy.com.de",
+            api_url: "https://pipedapi.privacy.com.de",
+            locations: "Germany",
+            cdn: true,
+            up_to_date: true,
+            uptime_30d: 99.5,
+            registered: "Yes",
+        },
+        {
+            name: "Kavin.rocks",
+            api_url: "https://pipedapi.kavin.rocks",
+            locations: "France",
+            cdn: true,
+            up_to_date: true,
+            uptime_30d: 99.0,
+            registered: "Yes",
+        },
+        {
+            name: "Ducks.party",
+            api_url: "https://pipedapi.ducks.party",
+            locations: "Germany",
+            cdn: true,
+            up_to_date: true,
+            uptime_30d: 98.5,
+            registered: "Yes",
+        },
+    ];
+
+    try {
+        const resp = await fetchJson(import.meta.env.VITE_PIPED_INSTANCES);
+        if (Array.isArray(resp) && resp.length > 0) {
+            publicInstances.value = resp;
+        } else {
+            publicInstances.value = curatedFallbacks;
         }
-    });
+    } catch (e) {
+        console.warn("Failed to fetch public instances list, using curated fallback list", e);
+        publicInstances.value = curatedFallbacks;
+    }
+
+    if (!publicInstances.value.some(instance => instance.api_url == apiUrl())) {
+        publicInstances.value.push({
+            name: "Selected Instance",
+            api_url: apiUrl(),
+            locations: "Unknown",
+            cdn: false,
+            up_to_date: true,
+            uptime_30d: 100,
+            registered: "Unknown",
+        });
+    }
 }
 
 function sslScore(url) {
