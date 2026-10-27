@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "updatedAt": 1793116845863,
+  "subscriptions": {
+    "items": [],
+    "updatedAt": 1793116845863
+  },
+  "watchHistory": {
+    "items": [],
+    "updatedAt": 1793116845863
+  },
+  "playlists": {
+    "items": [],
+    "updatedAt": 1793116845863
+  },
+  "preferences": {
+    "items": {
+      "nexustube_settings": "{\"theme\":\"dark\",\"accentColor\":\"#c084fc\",\"density\":\"comfortable\",\"sidebarCollapsed\":false,\"gridColumns\":3,\"youtubeApiKey\":\"AIzaSyBzWXMG8igOZPP7i_PXHiWMqO9xOznlIUs\",\"autoplay\":true,\"featuredContentEnabled\":true,\"sponsorBlockEnabled\":false}",
+      "skipOptions": "{\"sponsor\":\"auto\",\"intro\":\"no\",\"outro\":\"no\",\"preview\":\"no\",\"interaction\":\"auto\",\"selfpromo\":\"auto\",\"music_offtopic\":\"auto\",\"poi_highlight\":\"no\",\"filler\":\"no\"}",
+      "ghRepoOwner": "rbyers87",
+      "ghRepoName": "Piped",
+      "ghRepoBranch": "master",
+      "instance": "https://pipedapi.kavin.rocks"
+    },
+    "updatedAt": 1793116845863
+  }
+}
