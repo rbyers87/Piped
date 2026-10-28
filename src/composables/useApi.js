@@ -4,9 +4,7 @@ import { getPreferenceBoolean, getPreferenceString, setPreference } from "./useP
 // with ALLOWED_HOSTS in your Cloudflare Worker (if you deploy one).
 const API_INSTANCE_DEFAULTS = [
     "https://pipedapi.kavin.rocks",
-    "https://pipedapi.adminforge.de",
-    "https://pipedapi.privacy.com.de",
-    "https://pipedapi.ducks.party",
+    // Add other instances only after they return JSON in a browser tab.
 ];
 
 // Optional: set before building, e.g. VITE_CORS_PROXY_URL=https://yourproxy.workers.dev
