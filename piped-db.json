@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "updatedAt": 1793188767614,
+  "updatedAt": 1793188916078,
   "subscriptions": {
     "items": [],
     "updatedAt": 1793188767614
   },
   "watchHistory": {
     "items": [],
-    "updatedAt": 1793188767614
+    "updatedAt": 1793188916078
   },
   "playlists": {
     "items": [
@@ -21,7 +21,7 @@
         "videos": 0
       }
     ],
-    "updatedAt": 1793188767614
+    "updatedAt": 1793188916078
   },
   "preferences": {
     "items": {
@@ -30,7 +30,7 @@
       "ghRepoOwner": "rbyers87",
       "ghRepoName": "Piped",
       "ghRepoBranch": "master",
-      "instance": "https://pipedapi.ducks.party",
+      "instance": "https://pipedapi.adminforge.de",
       "subscriptions_updatedAt": "1793117602431",
       "localSubscriptions": "[]",
       "txle_seed_version": "2",
@@ -39,6 +39,6 @@
       "__noir_config": "{\"config\":{\"enabled\":\"auto\",\"ignoreBuiltInDarkMode\":false,\"keyboardShortcutsEnabled\":true,\"theme\":\"defaultTheme\",\"autoMode\":\"system\",\"autoModeTimeFrom\":1200,\"autoModeTimeTo\":420},\"scope\":{\"level\":\"global\"},\"theme\":{\"id\":\"defaultTheme\",\"backgroundColor\":\"111517\",\"textColor\":\"E8E6E3\",\"imageStyle\":{\"brightness\":1,\"grayscale\":0},\"invertIcons\":true},\"version\":3}",
       "playerAutoPlay": "false"
     },
-    "updatedAt": 1793188767614
+    "updatedAt": 1793188916078
   }
 }
