@@ -3,9 +3,9 @@ import { getPreferenceBoolean, getPreferenceString, setPreference } from "./useP
 // Ideally a single source of truth for this array. Make sure to keep this in sync
 // with ALLOWED_HOSTS in your Cloudflare Worker (if you deploy one).
 const API_INSTANCE_DEFAULTS = [
+    "https://pipedapi.kavin.rocks",
     "https://pipedapi.adminforge.de",
     "https://pipedapi.privacy.com.de",
-    "https://pipedapi.kavin.rocks",
     "https://pipedapi.ducks.party",
 ];
 
