@@ -1,0 +1,39 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://localhost:20128",
+    "ANTHROPIC_AUTH_TOKEN": "omniroute",
+    "ANTHROPIC_MODEL": "auto/best-free",
+    "ANTHROPIC_SMALL_FAST_MODEL": "cf/@cf/zai-org/glm-4.7-flash",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "cf/@cf/zai-org/glm-4.7-flash",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "cf/@cf/zai-org/glm-4.7-flash",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "cf/@cf/zai-org/glm-4.7-flash",
+    "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "131072",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "model": "gemma4",
+  "enabledPlugins": {
+    "hyperframes@hyperframes": true,
+    "scroll-world@scroll-world": true
+  },
+  "extraKnownMarketplaces": {
+    "hyperframes": {
+      "source": {
+        "source": "github",
+        "repo": "heygen-com/hyperframes"
+      }
+    },
+    "scroll-world": {
+      "source": {
+        "source": "github",
+        "repo": "oso95/scroll-world"
+      }
+    }
+  },
+  "modelSettings": {
+    "gemma4": {
+      "effortLevel": "high"
+    }
+  },
+  "theme": "auto",
+  "autoContinueAtUsageLimit": true
+}
