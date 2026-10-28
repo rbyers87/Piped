@@ -1,41 +1,41 @@
 {
-    "version": 1,
-    "updatedAt": 1793188916078,
-    "subscriptions": {
-        "items": [],
-        "updatedAt": 1793188767614
+  "version": 1,
+  "updatedAt": 1793191147831,
+  "subscriptions": {
+    "items": [],
+    "updatedAt": 1793191147831
+  },
+  "watchHistory": {
+    "items": [],
+    "updatedAt": 1793191147831
+  },
+  "playlists": {
+    "items": [
+      {
+        "playlistId": "local-d9950429-7058-4dc8-a6f8-7187bf40019e",
+        "id": "local-d9950429-7058-4dc8-a6f8-7187bf40019e",
+        "name": "Test ",
+        "description": "",
+        "thumbnail": "https://piped-proxy.ducks.party/vi/VZkl3s33Ryw/hq720.jpg?host=i.ytimg.com&rs=AOn4CLAPeveZBe2Vp9MamEyNBSn6KHgoQw&sqp=CLCVhtcG-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&v=6ae1312d",
+        "videoIds": "[\"VZkl3s33Ryw\"]",
+        "videos": 0
+      }
+    ],
+    "updatedAt": 1793191147831
+  },
+  "preferences": {
+    "items": {
+      "nexustube_settings": "{\"theme\":\"dark\",\"accentColor\":\"#c084fc\",\"density\":\"comfortable\",\"sidebarCollapsed\":false,\"gridColumns\":3,\"youtubeApiKey\":\"AIzaSyBzWXMG8igOZPP7i_PXHiWMqO9xOznlIUs\",\"autoplay\":true,\"featuredContentEnabled\":true,\"sponsorBlockEnabled\":false}",
+      "skipOptions": "{\"sponsor\":\"auto\",\"intro\":\"no\",\"outro\":\"no\",\"preview\":\"no\",\"interaction\":\"auto\",\"selfpromo\":\"auto\",\"music_offtopic\":\"auto\",\"poi_highlight\":\"no\",\"filler\":\"no\"}",
+      "ghRepoOwner": "rbyers87",
+      "ghRepoName": "Piped",
+      "ghRepoBranch": "master",
+      "instance": "https://pipedapi.ducks.party",
+      "subscriptions_updatedAt": "1793117602431",
+      "localSubscriptions": "[]",
+      "txle_seed_version": "2",
+      "playerAutoPlay": "false"
     },
-    "watchHistory": {
-        "items": [],
-        "updatedAt": 1793188916078
-    },
-    "playlists": {
-        "items": [
-            {
-                "playlistId": "local-d9950429-7058-4dc8-a6f8-7187bf40019e",
-                "id": "local-d9950429-7058-4dc8-a6f8-7187bf40019e",
-                "name": "Test ",
-                "description": "",
-                "thumbnail": "https://piped-proxy.ducks.party/vi/VZkl3s33Ryw/hq720.jpg?host=i.ytimg.com&rs=AOn4CLAPeveZBe2Vp9MamEyNBSn6KHgoQw&sqp=CLCVhtcG-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&v=6ae1312d",
-                "videoIds": "[\"VZkl3s33Ryw\"]",
-                "videos": 0
-            }
-        ],
-        "updatedAt": 1793188916078
-    },
-    "preferences": {
-        "items": {
-            "nexustube_settings": "{\"theme\":\"dark\",\"accentColor\":\"#c084fc\",\"density\":\"comfortable\",\"sidebarCollapsed\":false,\"gridColumns\":3,\"youtubeApiKey\":\"AIzaSyBzWXMG8igOZPP7i_PXHiWMqO9xOznlIUs\",\"autoplay\":true,\"featuredContentEnabled\":true,\"sponsorBlockEnabled\":false}",
-            "skipOptions": "{\"sponsor\":\"auto\",\"intro\":\"no\",\"outro\":\"no\",\"preview\":\"no\",\"interaction\":\"auto\",\"selfpromo\":\"auto\",\"music_offtopic\":\"auto\",\"poi_highlight\":\"no\",\"filler\":\"no\"}",
-            "ghRepoOwner": "rbyers87",
-            "ghRepoName": "Piped",
-            "ghRepoBranch": "master",
-            "instance": "https://pipedapi.adminforge.de",
-            "subscriptions_updatedAt": "1793117602431",
-            "localSubscriptions": "[]",
-            "txle_seed_version": "2",
-            "playerAutoPlay": "false"
-        },
-        "updatedAt": 1793188916078
-    }
+    "updatedAt": 1793191147831
+  }
 }
