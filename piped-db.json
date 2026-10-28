@@ -1,17 +1,27 @@
 {
   "version": 1,
-  "updatedAt": 1793166299782,
+  "updatedAt": 1793166386052,
   "subscriptions": {
     "items": [],
     "updatedAt": 1793165224553
   },
   "watchHistory": {
     "items": [],
-    "updatedAt": 1793166299782
+    "updatedAt": 1793166386052
   },
   "playlists": {
-    "items": [],
-    "updatedAt": 1793166299782
+    "items": [
+      {
+        "playlistId": "local-d9950429-7058-4dc8-a6f8-7187bf40019e",
+        "id": "local-d9950429-7058-4dc8-a6f8-7187bf40019e",
+        "name": "Test ",
+        "description": "",
+        "thumbnail": "https://piped-proxy.ducks.party/vi/VZkl3s33Ryw/hq720.jpg?host=i.ytimg.com&rs=AOn4CLAPeveZBe2Vp9MamEyNBSn6KHgoQw&sqp=CLCVhtcG-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg%3D%3D&v=6ae1312d",
+        "videoIds": "[\"VZkl3s33Ryw\"]",
+        "videos": 0
+      }
+    ],
+    "updatedAt": 1793166386052
   },
   "preferences": {
     "items": {
@@ -20,7 +30,7 @@
       "ghRepoOwner": "rbyers87",
       "ghRepoName": "Piped",
       "ghRepoBranch": "master",
-      "instance": "https://pipedapi.kavin.rocks",
+      "instance": "https://pipedapi.ducks.party",
       "subscriptions_updatedAt": "1793117602431",
       "localSubscriptions": "[]",
       "txle_seed_version": "2",
@@ -29,6 +39,6 @@
       "__noir_config": "{\"config\":{\"enabled\":\"auto\",\"ignoreBuiltInDarkMode\":false,\"keyboardShortcutsEnabled\":true,\"theme\":\"defaultTheme\",\"autoMode\":\"system\",\"autoModeTimeFrom\":1200,\"autoModeTimeTo\":420},\"scope\":{\"level\":\"global\"},\"theme\":{\"id\":\"defaultTheme\",\"backgroundColor\":\"111517\",\"textColor\":\"E8E6E3\",\"imageStyle\":{\"brightness\":1,\"grayscale\":0},\"invertIcons\":true},\"version\":3}",
       "playerAutoPlay": "false"
     },
-    "updatedAt": 1793166299782
+    "updatedAt": 1793166386051
   }
 }
