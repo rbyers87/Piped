@@ -597,8 +597,24 @@ async function setPlayerAttrs(localPlayer, el, uri, mime, shaka) {
             applyPreferredTextTrack();
             await setupThumbnailTrack();
         })
-        .catch(e => {
-            console.error(e);
+        .catch(async e => {
+            console.error("Shaka player error:", e);
+            if (e.code === 3016 && props.video.hls && mime !== "application/x-mpegURL") {
+                console.log("DASH playback failed with error 3016. Automatically falling back to HLS...");
+                try {
+                    error.value = 0;
+                    await playerInstance.load(props.video.hls, null, "application/x-mpegURL");
+                    el.volume = getPreferenceNumber("volume", 1);
+                    const rate = getPreferenceNumber("rate", 1);
+                    el.playbackRate = rate;
+                    el.defaultPlaybackRate = rate;
+                    applyPreferredTextTrack();
+                    await setupThumbnailTrack();
+                    return;
+                } catch (hlsErr) {
+                    console.error("HLS fallback failed:", hlsErr);
+                }
+            }
             error.value = e.code;
         });
 
