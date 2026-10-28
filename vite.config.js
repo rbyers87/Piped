@@ -40,6 +40,13 @@ export default defineConfig({
                 globIgnores: ["**/*-legacy-*.js"],
                 runtimeCaching: [
                     {
+                        // Never cache Piped API requests or our Worker proxy;
+                        // these are dynamic and stale failures would persist
+                        // otherwise.
+                        urlPattern: /https:\/\/(pipedapi\.|corsproxy|[^/]*\.workers\.dev)/i,
+                        handler: "NetworkOnly",
+                    },
+                    {
                         urlPattern: /https:\/\/[a-zA-Z./0-9_]*\.(?:otf|ttf)/i,
                         handler: "CacheFirst",
                         options: {

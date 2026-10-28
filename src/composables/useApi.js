@@ -1,93 +1,141 @@
 import { getPreferenceBoolean, getPreferenceString, setPreference } from "./usePreferences.js";
 
-let fallbackInstancesCache = [
+// Ideally a single source of truth for this array. Make sure to keep this in sync
+// with ALLOWED_HOSTS in your Cloudflare Worker.
+const API_INSTANCE_DEFAULTS = [
     "https://pipedapi.adminforge.de",
     "https://pipedapi.privacy.com.de",
     "https://pipedapi.kavin.rocks",
     "https://pipedapi.ducks.party",
 ];
 
-async function getFallbackInstances() {
-    try {
-        const res = await fetch("https://corsproxy.io/?https%3A%2F%2Fpiped-instances.kavin.rocks%2F");
-        if (res.ok) {
-            const data = await res.json();
-            const fetched = data.map(i => i.api_url).filter(Boolean);
-            if (fetched.length > 0) {
-                fallbackInstancesCache = Array.from(new Set([...fetched, ...fallbackInstancesCache]));
-            }
-        }
-    } catch (e) {
-        console.error("Failed to fetch public instances for fallback, using curated list", e);
-    }
-    return fallbackInstancesCache;
-}
+// Environment variable: set this before building (e.g., VITE_CORS_PROXY_URL=https://yourproxy.workers.dev)
+const CORS_PROXY_URL = import.meta.env.VITE_CORS_PROXY_URL || "";
 
-export async function fetchJson(url, params, options) {
-    let currentUrl = url;
+export async function fetchJson(url, params, options = {}) {
+    // Helper: build absolute URL with query params, tracking the original instance host
+    let instanceHost = null;
+    const baseUrl = typeof url === "string" ? url : url.href;
+
+    try {
+        instanceHost = new URL(baseUrl).hostname;
+    } catch {
+        // If we can't parse as a URL, we can't do instance-based fallback
+        instanceHost = null;
+    }
+
+    let currentUrl = baseUrl;
     if (params) {
-        currentUrl = new URL(url);
+        if (typeof currentUrl === "string") {
+            currentUrl = new URL(currentUrl);
+        }
         for (const pKey in params) currentUrl.searchParams.set(pKey, params[pKey]);
     }
 
     const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
 
-    // Route through CORS proxy by default for static hosting (GitHub Pages) to bypass browser CORS restrictions
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(urlStr)}`;
+    // If we have a custom proxy, try it first. If not, skip proxy entirely.
+    // TODO: Once your Worker is deployed, set VITE_CORS_PROXY_URL and remove this TODO.
+    const proxyUrl = CORS_PROXY_URL ? `${CORS_PROXY_URL}/?u=${encodeURIComponent(urlStr)}` : null;
 
-    try {
-        const response = await fetch(proxyUrl, options);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (proxyError) {
-        console.warn("CORS proxy request failed, attempting direct fetch...", proxyError);
+    const fetchWithTime = async (requestUrl, proxy, signal = null) => {
+        const fullUrl = proxy
+            ? `${CORS_PROXY_URL}/?u=${encodeURIComponent(requestUrl)}`
+            : requestUrl;
+
+        const signalWithTimeout = signal || new AbortController().signal;
+        // Default to 8s per attempt; frontend callers can pass an options.timeout to override.
+        const timeoutMs = options.timeout || 8000;
+        const controller = new AbortController();
+
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         try {
-            const response = await fetch(currentUrl, options);
+            const response = await fetch(fullUrl, {
+                ...options,
+                signal: AbortSignal.any([controller.signal, signalWithTimeout]),
+            });
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`, { cause: proxyError });
+                const text = await response.text().catch(() => "Unable to read response");
+                throw new Error(`HTTP ${response.status}: ${text.trim() || response.statusText}`, {
+                    cause: new Error(`Status ${response.status}`),
+                });
             }
-            return await response.json();
-        } catch (directError) {
-            console.warn("Direct fetch failed as well, trying instance failover...", directError);
 
-            const currentApi = apiUrl();
-            if (urlStr.includes(currentApi)) {
-                const fallbacks = await getFallbackInstances();
-                const otherFallbacks = fallbacks.filter(i => i !== currentApi);
-
-                for (const backupUrl of otherFallbacks) {
-                    try {
-                        console.log("Attempting fallback to instance:", backupUrl);
-                        setPreference("instance", backupUrl, true);
-
-                        let backupReqUrl = urlStr.replace(currentApi, backupUrl);
-                        if (params) {
-                            backupReqUrl = new URL(backupReqUrl);
-                            for (const bKey in params) backupReqUrl.searchParams.set(bKey, params[bKey]);
-                        }
-
-                        const backupUrlStr = backupReqUrl instanceof URL ? backupReqUrl.href : String(backupReqUrl);
-                        const backupProxyUrl = `https://corsproxy.io/?${encodeURIComponent(backupUrlStr)}`;
-
-                        const response = await fetch(backupProxyUrl, options);
-                        if (response.ok) {
-                            window.dispatchEvent(
-                                new CustomEvent("piped-instance-fallback", {
-                                    detail: { oldInstance: currentApi, newInstance: backupUrl },
-                                }),
-                            );
-                            return await response.json();
-                        }
-                    } catch (backupErr) {
-                        console.warn("Fallback instance failed:", backupUrl, backupErr);
-                    }
-                }
+            const contentType = response.headers.get("Content-Type");
+            if (contentType?.includes("application/json")) {
+                return await response.json();
             }
-            throw new Error(`All fetch attempts failed for ${urlStr}`, { cause: directError });
+
+            throw new Error(`Unexpected Content-Type: ${contentType}`);
+        } catch (err) {
+            clearTimeout(timeoutId);
+            throw err;
+        }
+    };
+
+    // Strategy: try direct → try proxy → try next instance (via proxy only)
+    let lastError;
+    const currentApi = apiUrl().replace(/\/$/, ""); // strip trailing slash
+
+    // First attempt: direct, if we can construct a reasonable URL
+    if (instanceHost) {
+        try {
+            console.log(`Fetching ${currentApi} directly (urlStr=${urlStr})`);
+            return await fetchWithTime(currentUrl, false);
+        } catch (directErr) {
+            console.warn(`Direct ${currentApi} failed:`, directErr);
+            lastError = directErr;
         }
     }
+
+    // Second attempt: proxy through our Worker
+    if (proxyUrl) {
+        try {
+            console.log("Trying proxy:", CORS_PROXY_URL);
+            return await fetchWithTime(currentUrl, true);
+        } catch (proxyErr) {
+            console.warn("Proxy failed:", proxyErr);
+            lastError = proxyErr;
+        }
+    }
+
+    // Third attempt: instance failover to other API hosts via proxy
+    // We only retry proxy routes if we have one. Should not hit here unless CORS_PROXY_URL is set.
+    if (CORS_PROXY_URL && instanceHost) {
+        const otherHosts = API_INSTANCE_DEFAULTS.filter(h => {
+            const hHost = h.replace(/\/$/, "").toLowerCase();
+            return hHost !== instanceHost.toLowerCase();
+        });
+
+        for (const backupUrl of otherHosts) {
+            const backupHost = backupUrl.replace(/\/$/, "").toLowerCase();
+
+            // Build replacement URL: replace instance host in the original request
+            const backupUrlStr = urlStr.replace(instanceHost, backupHost);
+            let backupReqUrl = backupUrlStr;
+            if (params) {
+                backupReqUrl = typeof backupReqUrl === "string"
+                    ? new URL(backupReqUrl)
+                    : backupUrlStr;
+            }
+
+            try {
+                console.log("Attempting fallback to instance:", backupUrl.replace(/\/$/, ""));
+                setPreference("instance", backupUrl, true);
+
+                return await fetchWithTime(backupReqUrl, true);
+            } catch (backupErr) {
+                console.warn("Fallback to instance failed:", backupUrl, backupErr);
+                lastError = backupErr;
+            }
+        }
+    }
+
+    // Final failure: all paths exhausted
+    const errorMessage = `All fetch attempts failed for ${urlStr}`;
+    throw new Error(errorMessage, { cause: lastError });
 }
 
 export function hashCode(s) {

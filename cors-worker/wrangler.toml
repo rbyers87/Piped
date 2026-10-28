@@ -1,0 +1,6 @@
+name = "piped-api-proxy"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Routes to match your deployed Worker URL
+# You'll match the domain of your Worker after deployment
