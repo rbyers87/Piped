@@ -636,15 +636,15 @@ async function loadVideo() {
     var uri;
     var mime;
 
+    const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const preferHlsSetting = getPreferenceBoolean("preferHls", isIOS);
+
     if (props.video.livestream) {
         uri = props.video.hls;
         mime = "application/x-mpegURL";
-    } else if (
-        props.video.audioStreams.length > 0 &&
-        !lbry &&
-        MseSupport &&
-        !getPreferenceBoolean("preferHls", false)
-    ) {
+    } else if (props.video.audioStreams.length > 0 && !lbry && MseSupport && !preferHlsSetting) {
         if (!props.video.dash) {
             const dash = (await import("../utils/DashUtils.js")).generate_dash_file_from_formats(
                 streams,
@@ -681,7 +681,7 @@ async function loadVideo() {
             return response.headers.get("Content-Type");
         });
         mime = contentType;
-    } else if (props.video.dash && !getPreferenceBoolean("preferHls", false)) {
+    } else if (props.video.dash && !preferHlsSetting) {
         uri = props.video.dash;
         mime = "application/dash+xml";
     } else if (props.video.hls) {
