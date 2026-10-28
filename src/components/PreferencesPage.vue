@@ -639,7 +639,7 @@ const repoConfig = getRepoConfig();
 const ghRepoToken = ref(repoConfig.token);
 const ghRepoOwner = ref(repoConfig.owner);
 const ghRepoName = ref(repoConfig.repo);
-const ghRepoBranch = ref(repoConfig.branch || "main");
+const ghRepoBranch = ref(repoConfig.branch || "master");
 
 async function performSync() {
     try {

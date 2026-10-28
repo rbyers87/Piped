@@ -14,11 +14,11 @@ export function getRepoConfig() {
         token: getPreferenceString("ghRepoToken", ""),
         owner: getPreferenceString("ghRepoOwner", ""),
         repo: getPreferenceString("ghRepoName", ""),
-        branch: getPreferenceString("ghRepoBranch", "main"),
+        branch: getPreferenceString("ghRepoBranch", "master"),
     };
 }
 
-export function setRepoConfig(token, owner, repo, branch = "main") {
+export function setRepoConfig(token, owner, repo, branch = "master") {
     setPreference("ghRepoToken", token);
     setPreference("ghRepoOwner", owner);
     setPreference("ghRepoName", repo);
