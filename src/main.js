@@ -8,6 +8,14 @@ import enLocale from "@/locales/en.json";
 import "./app.css";
 
 import("./registerServiceWorker");
+import { getPreferenceBoolean } from "@/composables/usePreferences.js";
+
+// Initialize Eruda for mobile debugging (enabled by default)
+if (getPreferenceBoolean("enableEruda", true)) {
+    import("eruda").then(eruda => {
+        eruda.default.init();
+    });
+}
 
 const i18n = createI18n({
     globalInjection: true,

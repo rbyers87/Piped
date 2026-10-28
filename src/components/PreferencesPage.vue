@@ -529,6 +529,14 @@
         </button>
     </div>
     <br />
+    <h2 class="my-4 text-center text-xl font-bold">Debugging</h2>
+    <PreferenceRow for-id="chkEnableEruda">
+        <template #label>
+            <strong>Enable Eruda Console (Mobile Debugging)</strong>
+        </template>
+        <PreferenceSwitch id="chkEnableEruda" v-model="enableEruda" @change="onChange" />
+    </PreferenceRow>
+    <br />
     <h2 id="instancesList" v-t="'actions.instances_list'" />
     <table class="w-full border text-left text-lg font-light">
         <thead>
@@ -715,6 +723,7 @@ const skipOptions = ref(createDefaultSkipOptions());
 const showMarkers = usePreferenceBoolean("showMarkers", true);
 const minSegmentLength = usePreferenceNumber("minSegmentLength", 0);
 const dearrow = usePreferenceBoolean("dearrow", false);
+const enableEruda = usePreferenceBoolean("enableEruda", true);
 const selectedTheme = usePreferenceString("theme", "dark");
 const autoPlayVideo = usePreferenceBoolean("playerAutoPlay", true);
 const autoDisplayCaptions = usePreferenceBoolean("autoDisplayCaptions", false);
