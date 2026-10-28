@@ -34,23 +34,14 @@ export async function fetchJson(url, params, options = {}) {
 
     const urlStr = currentUrl instanceof URL ? currentUrl.href : String(currentUrl);
 
-    // If we have a custom proxy, try it first. If not, skip proxy entirely.
-    // TODO: Once your Worker is deployed, set VITE_CORS_PROXY_URL and remove this TODO.
-    const proxyUrl = CORS_PROXY_URL ? `${CORS_PROXY_URL}/?u=${encodeURIComponent(urlStr)}` : null;
-
-    const fetchWithTime = async (requestUrl, proxy, signal = null) => {
-        const fullUrl = proxy
-            ? `${CORS_PROXY_URL}/?u=${encodeURIComponent(requestUrl)}`
-            : requestUrl;
-
-        const signalWithTimeout = signal || new AbortController().signal;
-        // Default to 8s per attempt; frontend callers can pass an options.timeout to override.
+    const fetchWithTimeout = async (targetUrl, signal = null) => {
         const timeoutMs = options.timeout || 8000;
         const controller = new AbortController();
-
+        const signalWithTimeout = signal || controller.signal;
         const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
         try {
-            const response = await fetch(fullUrl, {
+            const response = await fetch(targetUrl, {
                 ...options,
                 signal: AbortSignal.any([controller.signal, signalWithTimeout]),
             });
@@ -68,42 +59,47 @@ export async function fetchJson(url, params, options = {}) {
                 return await response.json();
             }
 
-            throw new Error(`Unexpected Content-Type: ${contentType}`);
+            try {
+                const cloned = response.clone();
+                return await cloned.json();
+            } catch {
+                throw new Error(`Unexpected Content-Type: ${contentType}`);
+            }
         } catch (err) {
             clearTimeout(timeoutId);
             throw err;
         }
     };
 
-    // Strategy: try direct → try proxy → try next instance (via proxy only)
-    let lastError;
-    const currentApi = apiUrl().replace(/\/$/, ""); // strip trailing slash
-
-    // First attempt: direct, if we can construct a reasonable URL
+    // Strategy 1: Direct fetch
     if (instanceHost) {
         try {
-            console.log(`Fetching ${currentApi} directly (urlStr=${urlStr})`);
-            return await fetchWithTime(currentUrl, false);
+            return await fetchWithTimeout(currentUrl);
         } catch (directErr) {
-            console.warn(`Direct ${currentApi} failed:`, directErr);
-            lastError = directErr;
+            console.warn(`Direct fetch failed for ${urlStr}:`, directErr);
         }
     }
 
-    // Second attempt: proxy through our Worker
-    if (proxyUrl) {
+    // Strategy 2: Custom proxy if configured (VITE_CORS_PROXY_URL)
+    if (CORS_PROXY_URL) {
         try {
-            console.log("Trying proxy:", CORS_PROXY_URL);
-            return await fetchWithTime(currentUrl, true);
-        } catch (proxyErr) {
-            console.warn("Proxy failed:", proxyErr);
-            lastError = proxyErr;
+            const proxyTarget = `${CORS_PROXY_URL}/?u=${encodeURIComponent(urlStr)}`;
+            return await fetchWithTimeout(proxyTarget);
+        } catch (customProxyErr) {
+            console.warn("Custom CORS proxy failed:", customProxyErr);
         }
     }
 
-    // Third attempt: instance failover to other API hosts via proxy
-    // We only retry proxy routes if we have one. Should not hit here unless CORS_PROXY_URL is set.
-    if (CORS_PROXY_URL && instanceHost) {
+    // Strategy 3: Public proxy (allorigins.win)
+    try {
+        const publicProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlStr)}`;
+        return await fetchWithTimeout(publicProxyUrl);
+    } catch (publicProxyErr) {
+        console.warn("Public proxy (allorigins) failed:", publicProxyErr);
+    }
+
+    // Strategy 4: Instance failover to other API hosts (direct or public proxy)
+    if (instanceHost) {
         const otherHosts = API_INSTANCE_DEFAULTS.filter(h => {
             const hHost = h.replace(/\/$/, "").toLowerCase();
             return hHost !== instanceHost.toLowerCase();
@@ -111,31 +107,26 @@ export async function fetchJson(url, params, options = {}) {
 
         for (const backupUrl of otherHosts) {
             const backupHost = backupUrl.replace(/\/$/, "").toLowerCase();
-
-            // Build replacement URL: replace instance host in the original request
             const backupUrlStr = urlStr.replace(instanceHost, backupHost);
-            let backupReqUrl = backupUrlStr;
-            if (params) {
-                backupReqUrl = typeof backupReqUrl === "string"
-                    ? new URL(backupReqUrl)
-                    : backupUrlStr;
-            }
 
             try {
                 console.log("Attempting fallback to instance:", backupUrl.replace(/\/$/, ""));
                 setPreference("instance", backupUrl, true);
 
-                return await fetchWithTime(backupReqUrl, true);
+                try {
+                    return await fetchWithTimeout(backupUrlStr);
+                } catch {
+                    const backupProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(backupUrlStr)}`;
+                    return await fetchWithTimeout(backupProxyUrl);
+                }
             } catch (backupErr) {
-                console.warn("Fallback to instance failed:", backupUrl, backupErr);
-                lastError = backupErr;
+                console.warn("Fallback instance failed:", backupUrl, backupErr);
             }
         }
     }
 
     // Final failure: all paths exhausted
-    const errorMessage = `All fetch attempts failed for ${urlStr}`;
-    throw new Error(errorMessage, { cause: lastError });
+    throw new Error(`All fetch attempts failed for ${urlStr}`);
 }
 
 export function hashCode(s) {
