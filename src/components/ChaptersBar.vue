@@ -13,7 +13,7 @@
         >
             <div class="flex">
                 <span class="mt-5 mr-2 text-current" v-text="index + 1" />
-                <img class="h-[30%] w-[30%] shrink-0" :src="chapter.image" :alt="chapter.title" />
+                <img class="size-[30%] shrink-0" :src="chapter.image" :alt="chapter.title" />
                 <div class="m-2 flex flex-col">
                     <span class="text-sm" :title="chapter.title" v-text="chapter.title" />
                     <span class="text-sm font-bold text-blue-500" v-text="timeFormat(chapter.start)" />

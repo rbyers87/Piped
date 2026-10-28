@@ -380,20 +380,20 @@
         <span class="text-sm text-green-500" v-text="syncStatus" />
         <div>
             <button
-                class="inline-block w-auto cursor-pointer rounded-sm bg-red-600 py-2 px-4 text-white hover:bg-red-700"
+                class="inline-block w-auto cursor-pointer rounded-sm bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                 @click="performSync"
             >
                 Sync Now
             </button>
             <button
-                class="ml-2 inline-block w-auto cursor-pointer rounded-sm bg-gray-300 py-2 px-4 text-gray-600 hover:bg-gray-500 hover:text-white dark:bg-dark-400 dark:text-gray-400"
+                class="ml-2 inline-block w-auto cursor-pointer rounded-sm bg-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-500 hover:text-white dark:bg-dark-400 dark:text-gray-400"
                 @click="exportFullBackup"
             >
                 Export Full Backup
             </button>
             <label
                 for="fullBackupSelector"
-                class="ml-2 inline-block w-auto cursor-pointer rounded-sm bg-gray-300 py-2 px-4 text-gray-600 hover:bg-gray-500 hover:text-white dark:bg-dark-400 dark:text-gray-400"
+                class="ml-2 inline-block w-auto cursor-pointer rounded-sm bg-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-500 hover:text-white dark:bg-dark-400 dark:text-gray-400"
             >
                 Import Backup
             </label>
@@ -460,7 +460,7 @@
             id="txtRepoBranch"
             v-model="ghRepoBranch"
             type="text"
-            placeholder="main"
+            placeholder="master"
             class="h-8 w-64 rounded-md bg-gray-300 px-2.5 text-gray-600 dark:bg-dark-400 dark:text-gray-400"
         />
     </label>
@@ -518,6 +518,17 @@
         </div>
         <br />
     </div>
+    <h2 class="my-4 text-center text-xl font-bold">Userscripts</h2>
+    <div class="mx-[15vw] my-2 flex items-center justify-between odd:bg-gray-200 max-md:mx-[2vw] dark:odd:bg-dark-800">
+        <span class="font-semibold">Manage Userscripts (Tampermonkey compatible)</span>
+        <button
+            class="inline-block w-auto cursor-pointer rounded-sm bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+            @click="$router.push('/userscripts')"
+        >
+            Userscript Manager
+        </button>
+    </div>
+    <br />
     <h2 id="instancesList" v-t="'actions.instances_list'" />
     <table class="w-full border text-left text-lg font-light">
         <thead>

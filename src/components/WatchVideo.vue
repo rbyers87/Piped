@@ -9,7 +9,7 @@
             :is-embed="isEmbed"
         />
     </div>
-    <div id="theaterModeSpot" class="-mx-[1vw]"></div>
+    <div id="theaterModeSpot" class="mx-[-1vw]"></div>
     <LoadingIndicatorPage :show-content="video != null && !isEmbed" class="w-full">
         <ErrorHandler v-if="video && video.error" :message="video.message" :error="video.error" />
         <Transition>
@@ -128,24 +128,32 @@
                         :playlist-index="index"
                         @close="showShareModal = !showShareModal"
                     />
-                    <div class="ml-auto flex flex-wrap gap-1 items-center">
+                    <div class="ml-auto flex flex-wrap items-center gap-1">
                         <!-- Subscribe Button -->
                         <button
-                            class="inline-flex items-center w-auto cursor-pointer rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:hidden max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                            class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:hidden max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                            @click="showDownloadModal = true"
+                        >
+                            <span>{{ $t("actions.download") || "Download" }}</span>
+                            <i-fa6-solid-download class="ml-1" />
+                        </button>
+                        <DownloadModal v-if="showDownloadModal" :video="video" @close="showDownloadModal = false" />
+                        <button
+                            class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:hidden max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
                             @click="downloadCurrentFrame"
                         >
                             <span>{{ $t("actions.download_frame") }}</span>
-                            <i-fa6-solid-download class="ml-1" />
+                            <i-fa6-solid-camera class="ml-1" />
                         </button>
                         <button
-                            class="inline-flex items-center w-auto cursor-pointer rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                            class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
                             @click="showModal = !showModal"
                         >
                             <span>{{ $t("actions.add_to_playlist") }}</span>
                             <i-fa6-solid-circle-plus class="ml-1" />
                         </button>
                         <button
-                            class="inline-flex items-center w-auto cursor-pointer rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                            class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
                             @click="subscribeHandler"
                         >
                             <span>
@@ -156,7 +164,7 @@
                                 }}
                             </span>
                         </button>
-                        <div class="flex flex-wrap gap-1 items-center">
+                        <div class="flex flex-wrap items-center gap-1">
                             <!-- RSS Feed button -->
                             <a
                                 v-if="video.uploaderUrl"
@@ -165,13 +173,13 @@
                                 role="button"
                                 :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${video.uploaderUrl.split('/')[2]}`"
                                 target="_blank"
-                                class="inline-flex items-center w-auto cursor-pointer rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                                class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
                             >
                                 <i-fa6-solid-rss class="mx-1.5" />
                             </a>
                             <!-- Share Dialog -->
                             <button
-                                class="inline-flex items-center w-auto cursor-pointer rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                                class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
                                 @click="showShareModal = !showShareModal"
                             >
                                 <strong class="max-lg:hidden">
@@ -192,7 +200,7 @@
                                 :to="toggleListenUrl"
                                 :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
                                 :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                class="inline-flex items-center w-auto cursor-pointer rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
+                                class="inline-flex w-auto cursor-pointer items-center rounded-sm bg-gray-300 py-2 text-gray-600 hover:bg-gray-500 hover:text-white focus:shadow-red-400 focus:outline-2 focus:outline-red-500 max-md:px-2 md:px-4 dark:bg-dark-400 dark:text-gray-400 dark:hover:bg-dark-300"
                             >
                                 <span>
                                     <i-fa6-solid-tv v-if="isListening" class="mx-1.5" />
@@ -368,6 +376,7 @@ import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
 import PlaylistAddModal from "./PlaylistAddModal.vue";
 import ShareModal from "./ShareModal.vue";
+import DownloadModal from "./DownloadModal.vue";
 import PlaylistVideos from "./PlaylistVideos.vue";
 import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
@@ -418,6 +427,7 @@ const active = ref(true);
 const smallView = ref(smallViewQuery.matches);
 const showModal = ref(false);
 const showShareModal = ref(false);
+const showDownloadModal = ref(false);
 const isMobile = ref(true);
 const currentTime = ref(0);
 const shouldShowToast = ref(false);

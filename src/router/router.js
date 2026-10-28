@@ -18,6 +18,11 @@ const routes = [
         component: () => import("../components/PreferencesPage.vue"),
     },
     {
+        path: "/userscripts",
+        name: "Userscripts",
+        component: () => import("../components/UserscriptsPage.vue"),
+    },
+    {
         path: "/results",
         name: "SearchResults",
         component: () => import("../components/SearchResults.vue"),

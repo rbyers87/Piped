@@ -136,8 +136,8 @@ export async function syncWithRepo() {
         const result = await saveDbToRepo(mergedData, remoteSha);
         return result;
     } catch (e) {
-        if (e.message && e.message.includes("409")) {
-            console.warn("SHA conflict (409) detected, refetching latest SHA and retrying...");
+        if (e.message && (e.message.includes("409") || e.message.includes("422") || e.message.includes("sha"))) {
+            console.warn("SHA conflict or missing SHA (409/422) detected, refetching latest SHA and retrying...");
             const latestRemote = await fetchDbFromRepo();
             const latestSha = latestRemote ? latestRemote.sha : null;
             const latestData = latestRemote ? latestRemote.content : null;
