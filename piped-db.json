@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "updatedAt": 1793191641720,
+  "updatedAt": 1793339861797,
   "subscriptions": {
     "items": [],
-    "updatedAt": 1793191641720
+    "updatedAt": 1793339861796
   },
   "watchHistory": {
     "items": [],
-    "updatedAt": 1793191641720
+    "updatedAt": 1793339861797
   },
   "playlists": {
     "items": [
@@ -21,7 +21,7 @@
         "videos": 0
       }
     ],
-    "updatedAt": 1793191641720
+    "updatedAt": 1793339861797
   },
   "preferences": {
     "items": {
@@ -34,8 +34,16 @@
       "subscriptions_updatedAt": "1793117602431",
       "localSubscriptions": "[]",
       "txle_seed_version": "2",
-      "playerAutoPlay": "false"
+      "playerAutoPlay": "false",
+      "eruda-resources": "{\"hideErudaSetting\":true,\"observeElement\":true}",
+      "eruda-dev-tools": "{\"transparency\":1,\"displaySize\":80,\"theme\":\"System preference\"}",
+      "eruda-elements": "{\"overrideEventTarget\":true}",
+      "eruda-sources": "{\"showLineNum\":true}",
+      "theme": "auto",
+      "eruda-console": "{\"asyncRender\":true,\"catchGlobalErr\":true,\"jsExecution\":true,\"overrideConsole\":true,\"displayExtraInfo\":false,\"displayUnenumerable\":true,\"displayGetterVal\":true,\"lazyEvaluation\":true,\"displayIfErr\":false,\"maxLogNum\":\"infinite\"}",
+      "eruda-entry-button": "{\"rememberPos\":true,\"pos\":{\"x\":352,\"y\":762}}",
+      "preferHls": "true"
     },
-    "updatedAt": 1793191641720
+    "updatedAt": 1793339861796
   }
 }
